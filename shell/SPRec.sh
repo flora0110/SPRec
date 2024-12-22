@@ -35,7 +35,8 @@ do
         touch "${sft_valid_data_path}"
         # Data Generation
         CUDA_VISIBLE_DEVICES=$gpu1,$gpu2,$gpu3,$gpu4 python ./train/data_generate.py \
-            --json_file ./data/${category}/train.json \
+            --train_json_file ./data/${category}/train.json \
+            --valid_json_file ./data/${category}/valid.json \
             --result_json_dpo_data_train $dpo_train_data_path \
             --result_json_dpo_data_valid $dpo_valid_data_path \
             --result_json_sft_data_train $sft_train_data_path \
@@ -44,7 +45,7 @@ do
             --lora_weights $lora_weights \
             --batch_size 64 \
             --train_sample_size $train_sample_size \
-            --valid_sample_size $valid_sample_size
+            --valid_sample_size $valid_sample_size \
         # SFT
         wandb_name="iteration${i}_SFT"
         SFT_path="${it_output_dir}SFT"

@@ -9,6 +9,7 @@ torch.set_num_threads(1)
 from sentence_transformers import SentenceTransformer
 import random
 import transformers
+from tqdm import tqdm
 import json
 import os
 os.environ['OPENBLAS_NUM_THREADS'] = '1'
@@ -22,7 +23,8 @@ else:
     device = "cpu"
 
 def main(
-    json_file : str  = "",
+    train_json_file : str  = "",
+    valid_json_file : str = "",
     result_json_dpo_data_train: str = "",
     result_json_dpo_data_valid: str = "",
     result_json_sft_data_train: str = "",
@@ -35,7 +37,6 @@ def main(
     load_8bit: bool = False,
     random_neg: bool = False,
 ):
-    sample_size = train_sample_size + valid_sample_size + 500 # In case fail to generate
 
     # generate responses from model
     tokenizer =  AutoTokenizer.from_pretrained(base_model)
@@ -97,66 +98,67 @@ def main(
     
     outputs = []
     tokenizer.pad_token_id = tokenizer.eos_token_id
-    from tqdm import tqdm
-    with open(json_file, 'r') as f:
-        test_data = json.load(f)
-        test_data = random.sample(test_data, sample_size)
-        sft_train_data = test_data[:train_sample_size]
-        sft_valid_data = test_data[train_sample_size:train_sample_size + valid_sample_size]
-        with open(result_json_sft_data_train, 'w') as f:
-            for item in sft_train_data:
-                json.dump(item, f) 
-                f.write('\n') 
-        with open(result_json_sft_data_valid, 'w') as f:
-            for item in sft_valid_data:
-                json.dump(item, f) 
-                f.write('\n')    
 
-        instructions = [_['instruction'] for _ in test_data]
-        inputs = [_['input'] for _ in test_data]
-        def batch(list, batch_size=batch_size):
-            chunk_size = (len(list) - 1) // batch_size + 1
-            for i in range(chunk_size):
-                yield list[batch_size * i: batch_size * (i + 1)]
-        for i, batch in tqdm(enumerate(zip(batch(instructions), batch(inputs)))):
-            instructions, inputs = batch
-            output = evaluate(instructions, inputs)
-            outputs = outputs + output
-            
-        for i, test in tqdm(enumerate(test_data)):
-            test_data[i]['predict'] = outputs[i]
+    with open(train_json_file, 'r') as f:
+        train_data = json.load(f)
+        train_data = random.sample(train_data, train_sample_size)
+        sft_train_data = train_data
+    with open(valid_json_file, 'r') as f:
+        valid_data = json.load(f)
+        valid_data = random.sample(valid_data, valid_sample_size)
+        sft_valid_data = valid_data
+    with open(result_json_sft_data_train, 'w') as f:
+        for item in sft_train_data:
+            json.dump(item, f) 
+            f.write('\n') 
+    with open(result_json_sft_data_valid, 'w') as f:
+        for item in sft_valid_data:
+            json.dump(item, f) 
+            f.write('\n')    
+    data = train_data + valid_data
+    instructions = [_['instruction'] for _ in data]
+    inputs = [_['input'] for _ in data]
+    def batch(list, batch_size=batch_size):
+        chunk_size = (len(list) - 1) // batch_size + 1
+        for i in range(chunk_size):
+            yield list[batch_size * i: batch_size * (i + 1)]
+    for i, batch in tqdm(enumerate(zip(batch(instructions), batch(inputs)))):
+        instructions, inputs = batch
+        output = evaluate(instructions, inputs)
+        outputs = outputs + output
+        
+    for i, test in tqdm(enumerate(data)):
+        data[i]['predict'] = outputs[i]
 
     dpo_data = []
-    count = 0
-    print(f"Length of test_data : {len(test_data)}")
-    for data in test_data:
+
+    for data_point in data:
         dpo_case = {}
-        dpo_case['prompt'] = data['instruction'] + data['input']
-        dpo_case['chosen'] = data['output']
+        dpo_case['prompt'] = data_point['instruction'] + data_point['input']
+        dpo_case['chosen'] = data_point['output']
         pattern = r'"(.*?)"'
-        item_names = re.findall(pattern, data['predict'][0])
+        item_names = re.findall(pattern, data_point['predict'][0])
         formatted_item_names = [f'\"{item}\"' for item in item_names]
-        if(len(formatted_item_names)==0):
-            continue
-        dpo_case['rejected'] = formatted_item_names[0]+"\n"
+        if len(formatted_item_names) > 0:
+            dpo_case['rejected'] = formatted_item_names[0]+"\n"
+        else:
+            dpo_case['rejected'] = "\n"
         dpo_data.append(dpo_case)
-        count += 1
-        if count == train_sample_size + valid_sample_size:
-            break
-    random.shuffle(dpo_data)
+        
+    # random.shuffle(dpo_data)
     dpo_train_data = dpo_data[:train_sample_size]
     dpo_valid_data = dpo_data[train_sample_size:]
 
 
     with open(result_json_dpo_data_train, 'w') as f:
         for item in dpo_train_data:
-            json.dump(item, f)  # 将字典转换为 JSON 格式写入文件
-            f.write('\n')  # 每个 JSON 对象之间用换行分隔
+            json.dump(item, f)  
+            f.write('\n')  
 
     with open(result_json_dpo_data_valid, 'w') as f:
         for item in dpo_valid_data:
-            json.dump(item, f)  # 将字典转换为 JSON 格式写入文件
-            f.write('\n')  # 每个 JSON 对象之间用换行分隔
+            json.dump(item, f)  
+            f.write('\n')
 
 
 def generate_prompt(instruction, input=None):
