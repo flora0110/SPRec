@@ -1,11 +1,11 @@
 
-# SPRec: Leveraging Self-Play to Debias Preference Alignment for Large Language Model-based Recommendations
+# SPRec: Self-Play to Debias LLM-based Recommendation
 
 <div style="text-align: center;">
 <img src="./figs/method.png" alt="introduction" style="zoom:50%;" />
 </div>
 
-This repository provides the official PyTorch implementation and reproduction for the paper titled "SPRec: Leveraging Self-Play to Debias Preference Alignment for Large Language Model-based Recommendations" 
+This repository provides the official PyTorch implementation and reproduction for the paper titled "SPRec: Self-Play to Debias LLM-based Recommendation" 
 
 ## Installation
 
