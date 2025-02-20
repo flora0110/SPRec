@@ -32,7 +32,7 @@ This repository provides the official PyTorch implementation and reproduction fo
 
 ## Quick Start
 
-Due to GitHub's file size limitations, we have uploaded the minimal sample dataset **Goodreads** in `./data/Goodreads` and `./eval/Goodreads` for reproduction purposes. Additionally, the datasets used in our experiments—**MovieLens**, **CDs and Vinyl**, and **Steam**—will be uploaded to [ link coming soon ] later. If you wish to use a different dataset, please ensure that it is processed into a similar format.
+Due to GitHub's file size limitations, we have uploaded the minimal sample dataset **Goodreads** in `./data/Goodreads` and `./eval/Goodreads` for reproduction purposes. Additionally, the datasets used in our experiments—**MovieLens**, **CDs and Vinyl**, and **Steam**—have been uploaded to [Datasets](https://zenodo.org/uploads/14900102). If you wish to use a different dataset, please ensure that it is processed into a similar format.
 
 Besides, to ensure that SPRec does not encounter more training data during multiple iterations compared to other baseline methods, it is recommended to sample the training dataset beforehand to limit its size. The sample dataset we provide has already been sampled and contains 5,000 entries. You can further sample it according to your requirements to control the total amount of data SPRec is exposed to during training.
 
