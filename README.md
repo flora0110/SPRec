@@ -48,3 +48,16 @@ Besides, to ensure that SPRec does not encounter more training data during multi
     ```bash
     bash ./shell/SPRec.sh 0 1 2 3 5 # Specify your GPUs, e.g., 0 1 2 3, and the number of iterations, e.g., 5
 Once the above commands are executed, the evaluation results for top-1 and top-5 recommendations will be saved as eval_top1.json and eval_top5.json in the corresponding model directory.
+
+## **Baseline Implementations Acknowledgement
+This repository also includes implementations of baseline methods in our paper for research comparison. We sincerely acknowledge the original authors for their foundational work.
+
+If you find this repository helpful, we kindly request citing our paper:
+```
+@article{gao2024sprec,
+  title={SPRec: Self-Play to Debias LLM-based Recommendation},
+  author={Gao, Chongming and Chen, Ruijun and Yuan, Shuai and Huang, Kexin and Yu, Yuanqing and He, Xiangnan},
+  journal={arXiv preprint arXiv:2412.09243},
+  year={2024}
+}
+```
