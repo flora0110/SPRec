@@ -32,7 +32,7 @@ This repository provides the official PyTorch implementation and reproduction fo
 
 ## Quick Start
 
-Due to GitHub's file size limitations, we have uploaded the minimal sample dataset **Goodreads** in `./data/Goodreads` and `./eval/Goodreads` for reproduction purposes. Additionally, the datasets used in our experiments—**MovieLens**, **CDs and Vinyl**, and **Steam**—have been uploaded to [Datasets](https://zenodo.org/uploads/14900102). If you wish to use a different dataset, please ensure that it is processed into a similar format.
+Due to GitHub's file size limitations, we have uploaded the minimal sample dataset **Goodreads** in `./data/Goodreads` and `./eval/Goodreads` for reproduction purposes. Additionally, the datasets used in our experiments—**MovieLens**, **CDs and Vinyl**, and **Steam**—have been uploaded to [Datasets](https://zenodo.org/records/14900102?token=eyJhbGciOiJIUzUxMiJ9.eyJpZCI6IjMwYTA1OWM4LWRjZTctNDJmNC1iOWY2LTRjZWQyZjZiNjY5ZCIsImRhdGEiOnt9LCJyYW5kb20iOiI2ZTYyZDZkZTFlNDM5NjA2ZGMwMTA2YWIxMjdjMDJmNCJ9.g2bckZWGA77AEg9EBARxN45rmXYfGD8RuRzy41CZACcDh2XESWxAGD3b91ecu_FEbmYQSzR5qBTH0xvQC_Lw2Q). If you wish to use a different dataset, please ensure that it is processed into a similar format.
 
 Besides, to ensure that SPRec does not encounter more training data during multiple iterations compared to other baseline methods, it is recommended to sample the training dataset beforehand to limit its size. The sample dataset we provide has already been sampled and contains 5,000 entries. You can further sample it according to your requirements to control the total amount of data SPRec is exposed to during training.
 
