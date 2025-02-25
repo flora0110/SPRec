@@ -14,19 +14,13 @@ This repository provides the official PyTorch implementation and reproduction fo
 2. A new [conda environment](https://docs.conda.io/projects/conda/en/latest/user-guide/concepts/environments.html) is suggested. 
 
     ```bash
-    conda create --name SPRec python=3.10 -y
+    conda env create -f environment.yml  
     ```
 
 3. Activate the newly created environment.
 
     ```bash
     conda activate SPRec
-    ```
-
-4. Install the required modules from pip.
-
-    ```bash
-    pip install -r requirements.txt
     ```
 
 
