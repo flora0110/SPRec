@@ -1,0 +1,7 @@
+checkpoint-*/
+**/checkpoint-*/
+
+*.safetensors
+*.pt
+*.pth
+training_args.bin

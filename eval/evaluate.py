@@ -71,7 +71,7 @@ f = open(result_json, 'r')
 test_data = json.load(f)
 total = 0
 # Identify your sentence-embedding model
-model = SentenceTransformer('/data/chenruijun/code/models/paraphrase-MiniLM-L3-v2')
+model = SentenceTransformer('/scratch/user/chuanhsin0110/models/paraphrase-MiniLM-L3-v2')
 
 from tqdm import tqdm
 embeddings = torch.tensor(embeddings).cuda()

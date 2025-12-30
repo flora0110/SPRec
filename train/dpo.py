@@ -111,23 +111,25 @@ def main(
         bf16=True,
         logging_steps=1,
         optim="adamw_torch",
-        evaluation_strategy="steps",
+        do_eval=True, # enable evaluation
+        eval_strategy="steps", # chage evaluation_strategy to eval_strategy
         save_strategy="steps",
         output_dir=output_dir,
         save_total_limit=1,
         load_best_model_at_end=True,
+        beta=0.1, # move beto from DPOTrainer to DPOConfig
+        max_prompt_length=cutoff_len,
+        max_length=cutoff_len,
     )
 
     dpo_trainer = DPOTrainer(
         model,
         reference_model,
         args=training_args,
-        beta=0.1,
         train_dataset=train_data,
         eval_dataset=val_data,
-        tokenizer=tokenizer,
-        max_prompt_length=cutoff_len,
-        max_length=cutoff_len,
+        processing_class=tokenizer,
+        
     )
 
 

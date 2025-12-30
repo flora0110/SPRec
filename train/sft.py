@@ -1,7 +1,7 @@
 import os
 import torch
 import re
-import wandb
+# import wandb
 
 from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments,BitsAndBytesConfig
 from datasets import load_dataset
@@ -40,6 +40,12 @@ def train(
     os.environ['WANDB_PROJECT'] = wandb_project
 
     def formatting_prompts_func(examples):
+
+        # Check if the input is batched
+        is_batched = isinstance(examples["instruction"], list)
+        if not is_batched:
+            examples = {k: [v] for k, v in examples.items()}
+        
         output_text = []
         for i in range(len(examples["instruction"])):
             instruction = examples["instruction"][i]
@@ -129,21 +135,21 @@ def train(
         bf16=True,
         logging_steps=1,
         optim="adamw_torch",
-        evaluation_strategy="steps",
+        eval_strategy="steps",
         save_strategy="steps",
         output_dir=output_dir,
         save_total_limit=1,
         load_best_model_at_end=True,
         report_to=None,
+        max_seq_length=cutoff_len, # move max_seq_length from SFTTrainer to SFTConfig
     )
 
     trainer = SFTTrainer(
         model,
         train_dataset=train_data,
         eval_dataset=val_data,
-        tokenizer=tokenizer,
+        processing_class=tokenizer,
         formatting_func=formatting_prompts_func,
-        max_seq_length=cutoff_len,
         args=training_args
     )
 

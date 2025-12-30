@@ -1,7 +1,7 @@
 # bash ./shell/eval_single_file.sh 0 2 4 5
-base_model=$5
-lora_weights=$6
-category=$7
+base_model=$2
+lora_weights=$3
+category=$4
 # Only change the parameters above if needed
 echo -------------------------------------- Evaluation started! --------------------------------------
 
