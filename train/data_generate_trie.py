@@ -82,10 +82,8 @@ def main(
     num_return_sequences: int = 3,  # [新增] 想要保留幾個候選者
     diverse_beam_search: bool = False, # [新增] 是否啟用多樣化束搜索
     diversity_penalty: float = 1.0,    # [新增] 多樣性懲罰係數
-    seed: int = 42, 
     sh_file_path: str = "",
 ):  
-    set_seed(seed)
     save_run_script_content(sh_file_path, result_json_dpo_data_train)
 
     # generate responses from model
@@ -261,22 +259,52 @@ def main(
     outputs = []
     tokenizer.pad_token_id = tokenizer.eos_token_id
 
-    with open(train_json_file, 'r') as f:
-        train_data = json.load(f)
-        train_data = random.sample(train_data, train_sample_size)
-        sft_train_data = train_data
-    with open(valid_json_file, 'r') as f:
-        valid_data = json.load(f)
-        valid_data = random.sample(valid_data, valid_sample_size)
-        sft_valid_data = valid_data
-    with open(result_json_sft_data_train, 'w') as f:
-        for item in sft_train_data:
-            json.dump(item, f) 
-            f.write('\n') 
-    with open(result_json_sft_data_valid, 'w') as f:
-        for item in sft_valid_data:
-            json.dump(item, f) 
-            f.write('\n')    
+    # with open(train_json_file, 'r') as f:
+    #     train_data = json.load(f)
+    #     train_data = random.sample(train_data, train_sample_size)
+    #     sft_train_data = train_data
+    # with open(valid_json_file, 'r') as f:
+    #     valid_data = json.load(f)
+    #     valid_data = random.sample(valid_data, valid_sample_size)
+    #     sft_valid_data = valid_data
+    # with open(result_json_sft_data_train, 'w') as f:
+    #     for item in sft_train_data:
+    #         json.dump(item, f) 
+    #         f.write('\n') 
+    # with open(result_json_sft_data_valid, 'w') as f:
+    #     for item in sft_valid_data:
+    #         json.dump(item, f) 
+    #         f.write('\n')    
+
+
+    # 新邏輯:
+    print(f"Loading SFT data from: {result_json_sft_data_train} (Train) and {result_json_sft_data_valid} (Valid)")
+    
+    sft_train_data = []
+    if result_json_sft_data_train and os.path.exists(result_json_sft_data_train):
+        with open(result_json_sft_data_train, 'r') as f:
+            for line in f:
+                if line.strip():
+                    sft_train_data.append(json.loads(line))
+    else:
+        raise FileNotFoundError(f"SFT Train file not found: {result_json_sft_data_train}")
+
+    sft_valid_data = []
+    if result_json_sft_data_valid and os.path.exists(result_json_sft_data_valid):
+        with open(result_json_sft_data_valid, 'r') as f:
+            for line in f:
+                if line.strip():
+                    sft_valid_data.append(json.loads(line))
+    else:
+        # 如果沒有 valid file，可以設為空列表或拋出異常，這裡假設可能為空
+        print(f"Warning: SFT Valid file not found: {result_json_sft_data_valid}")
+
+    train_sample_size = len(sft_train_data)
+    valid_sample_size = len(sft_valid_data)
+    
+    train_data = sft_train_data
+    valid_data = sft_valid_data
+
     data = train_data + valid_data
     instructions = [_['instruction'] for _ in data]
     inputs = [_['input'] for _ in data]

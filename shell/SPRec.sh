@@ -36,42 +36,42 @@ do
         touch "${sft_train_data_path}"
         touch "${sft_valid_data_path}"
         # Data Generation
-        CUDA_VISIBLE_DEVICES=$gpu1 python ./train/data_generate.py \
-            --train_json_file ./data/${category}/train.json \
-            --valid_json_file ./data/${category}/valid.json \
-            --result_json_dpo_data_train $dpo_train_data_path \
-            --result_json_dpo_data_valid $dpo_valid_data_path \
-            --result_json_sft_data_train $sft_train_data_path \
-            --result_json_sft_data_valid $sft_valid_data_path \
-            --base_model $base_model \
-            --lora_weights $lora_weights \
-            --batch_size 64 \
-            --train_sample_size $train_sample_size \
-            --valid_sample_size $valid_sample_size \
-        # SFT
-        wandb_name="iteration${i}_SFT"
-        SFT_path="${it_output_dir}SFT"
-        mkdir -p $SFT_path
-        CUDA_VISIBLE_DEVICES=$gpu1 python ./train/sft.py \
-            --resume_from_checkpoint $lora_weights \
-            --output_dir $SFT_path \
-            --base_model $base_model \
-            --train_dataset $sft_train_data_path \
-            --valid_dataset $sft_valid_data_path \
-            --train_sample_size $train_sample_size \
-            --wandb_project $wandb_project \
-            --wandb_name $wandb_name \
-            --gradient_accumulation_steps 16 \
-            --batch_size $batch_size \
-            --num_train_epochs 1 \
-            --learning_rate $lr \
-            --cutoff_len 512 \
-        # Evaluate SFT model
-        lora_weights=$SFT_path
-        bash ./shell/eval_single_file.sh  $gpu1 \
-                                        $base_model \
-                                        $lora_weights \
-                                        $category
+        # CUDA_VISIBLE_DEVICES=$gpu1 python ./train/data_generate.py \
+        #     --train_json_file ./data/${category}/train.json \
+        #     --valid_json_file ./data/${category}/valid.json \
+        #     --result_json_dpo_data_train $dpo_train_data_path \
+        #     --result_json_dpo_data_valid $dpo_valid_data_path \
+        #     --result_json_sft_data_train $sft_train_data_path \
+        #     --result_json_sft_data_valid $sft_valid_data_path \
+        #     --base_model $base_model \
+        #     --lora_weights $lora_weights \
+        #     --batch_size 64 \
+        #     --train_sample_size $train_sample_size \
+        #     --valid_sample_size $valid_sample_size \
+        # # SFT
+        # wandb_name="iteration${i}_SFT"
+        # SFT_path="${it_output_dir}SFT"
+        # mkdir -p $SFT_path
+        # CUDA_VISIBLE_DEVICES=$gpu1 python ./train/sft.py \
+        #     --resume_from_checkpoint $lora_weights \
+        #     --output_dir $SFT_path \
+        #     --base_model $base_model \
+        #     --train_dataset $sft_train_data_path \
+        #     --valid_dataset $sft_valid_data_path \
+        #     --train_sample_size $train_sample_size \
+        #     --wandb_project $wandb_project \
+        #     --wandb_name $wandb_name \
+        #     --gradient_accumulation_steps 16 \
+        #     --batch_size $batch_size \
+        #     --num_train_epochs 1 \
+        #     --learning_rate $lr \
+        #     --cutoff_len 512 \
+        # # Evaluate SFT model
+        # lora_weights=$SFT_path
+        # bash ./shell/eval_single_file.sh  $gpu1 \
+        #                                 $base_model \
+        #                                 $lora_weights \
+        #                                 $category
         # DPO
         wandb_name="iteration${i}_DPO"
         DPO_path="${it_output_dir}DPO/"

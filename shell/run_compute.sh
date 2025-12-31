@@ -1,10 +1,10 @@
 #!/bin/bash
-
+its=$1
 # ==== 設定變數 ====
 base_model="meta-llama/Llama-3.2-1B-Instruct" # [重要] 這裡要填 Base Model
 NUM_RANDOM_ITEMS=50
 RANDOM_SEED=42
-CHUNK_SIZE=100
+CHUNK_SIZE=260
 
 # ==== 執行 Python 腳本 ====
 for category in "Goodreads"
@@ -14,7 +14,7 @@ do
     id2name_path="./eval/${category}/id2name.json"
     
     # [修正 1] 移除等號後的空白
-    output_dir="./models/Random${NUM_RANDOM_ITEMS}_Similarity/${category}"
+    # output_dir="./models/Random${NUM_RANDOM_ITEMS}_Similarity/${category}"
 
     echo "Starting metric computation..."
     echo "Category: ${category}"
@@ -29,31 +29,38 @@ do
     # [注意] 這裡我修改了參數，讓它同時傳入 base_model 和 lora_weights
     # 請記得同步修改 Python 程式 (見下方)
     
-    # 1. Run for Training Data
-    echo "Processing Training Data..."
-    python ./train/compute_similarity.py \
-        --data_path "./data/${category}/train.json" \
-        --id2name_path "${id2name_path}" \
-        --model_path "${base_model}" \
-        --lora_path "${lora_weights}" \
-        --output_dir "${output_dir}" \
-        --output_prefix "train_item_pref_similarity" \
-        --num_random_items ${NUM_RANDOM_ITEMS} \
-        --random_seed ${RANDOM_SEED} \
-        --chunk_size ${CHUNK_SIZE}
-
-    # 2. Run for Validation Data
-    echo "Processing Validation Data..."
-    python ./train/compute_similarity.py \
-        --data_path "./data/${category}/valid.json" \
-        --id2name_path "${id2name_path}" \
-        --model_path "${base_model}" \
-        --lora_path "${lora_weights}" \
-        --output_dir "${output_dir}" \
-        --output_prefix "valid_item_pref_similarity" \
-        --num_random_items ${NUM_RANDOM_ITEMS} \
-        --random_seed ${RANDOM_SEED} \
-        --chunk_size ${CHUNK_SIZE}
-
+    # # 1. Run for Training Data
+    # echo "Processing Training Data..."
+    # python ./train/compute_similarity.py \
+    #     --data_path "./data/${category}/train.json" \
+    #     --id2name_path "${id2name_path}" \
+    #     --model_path "${base_model}" \
+    #     --lora_path "${lora_weights}" \
+    #     --output_dir "${output_dir}" \
+    #     --output_prefix "train_item_pref_similarity" \
+    #     --num_random_items ${NUM_RANDOM_ITEMS} \
+    #     --random_seed ${RANDOM_SEED} \
+    #     --chunk_size ${CHUNK_SIZE}
+    for ((i=0;i<$its;i++))
+    do
+        it_output_dir="./models/Random${NUM_RANDOM_ITEMS}_Similarity/${category}/it${i}"
+        SPRec_input_dir="./models/SPRec/Goodreads_2048_0.00002/it${i}"
+        sft_valid_data_path="${SPRec_input_dir}/data/sft_valid.jsonl"
+        # mkdir -p $it_output_dir
+        # mkdir -p "${it_output_dir}/data"
+        touch "${sft_valid_data_path}"
+        # 2. Run for Validation Data
+        echo "Processing Validation Data..."
+        python ./train/compute_similarity.py \
+            --data_path $sft_valid_data_path \
+            --id2name_path "${id2name_path}" \
+            --model_path "${base_model}" \
+            --lora_path "${lora_weights}" \
+            --output_dir "${it_output_dir}" \
+            --output_prefix "valid_item_pref_similarity" \
+            --num_random_items ${NUM_RANDOM_ITEMS} \
+            --random_seed ${RANDOM_SEED} \
+            --chunk_size ${CHUNK_SIZE}
+    done
     echo "Done with ${category}!"
 done

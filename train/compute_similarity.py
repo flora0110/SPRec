@@ -125,7 +125,6 @@ def main():
     parser.add_argument("--output_dir", type=str, required=True, help="Directory to save output files")
     parser.add_argument("--output_prefix", type=str, default="random50_item_pref_similarity", help="Prefix for output filenames")
     parser.add_argument("--lora_path", type=str, default=None, help="Path to LoRA adapter")
-
     # Parameter arguments
     parser.add_argument("--num_random_items", type=int, default=50, help="Number of random items to sample")
     parser.add_argument("--random_seed", type=int, default=42, help="Random seed")
@@ -142,8 +141,17 @@ def main():
     # ==== 3) 讀 GoodReads data & id2name ====
 
     print(f"Loading data from {args.data_path}")
-    with open(args.data_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
+    data = []
+    if args.data_path and os.path.exists(args.data_path):
+        with open(args.data_path, 'r') as f:
+            for line in f:
+                if line.strip():
+                    data.append(json.loads(line))
+    else:
+        # 如果沒有 valid file，可以設為空列表或拋出異常，這裡假設可能為空
+        print(f"Warning: SFT Valid file not found: {result_json_sft_data_valid}")
+    # with open(args.data_path, "r", encoding="utf-8") as f:
+    #     data = json.load(f)
 
     print(f"Loading id2name from {args.id2name_path}")
     with open(args.id2name_path, "r", encoding="utf-8") as f:
