@@ -1,6 +1,7 @@
 checkpoint-*/
 **/checkpoint-*/
-
+__pycache__/
+**/__pycache__/
 *.safetensors
 *.pt
 *.pth
