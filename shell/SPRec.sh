@@ -21,7 +21,7 @@ do
     echo "Category: $category"
     echo "Learning Rate: $lr"
 
-    for ((i=3;i<$its;i++))
+    for ((i=0;i<$its;i++))
     do
         echo ----------------- Iteration$i starts! -----------------
         it_output_dir="${output_dir}/it${i}/"
